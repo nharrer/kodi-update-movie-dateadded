@@ -10,7 +10,7 @@ from contextlib import closing
 # ---------------------------------------------------
 
 # IMPORTANT: In the standard case (sqlite3) just point this to your own MyVideos database.
-DATABASE_PATH = os.path.join(r"C:\Users\<Your User>\AppData\Roaming\Kodi\userdata\Database", 'MyVideos90.db')
+DATABASE_PATH = os.path.join(r"C:\Users\<Your User>\AppData\Roaming\Kodi\userdata\Database", 'MyVideos93.db')
 
 # Or if you're using MySQL as a database, change MYSQL to True and change the other MySQL settings accordingly.
 # Also make sure to install the MySQL python package: https://pypi.python.org/pypi/MySQL-python/1.2.5
@@ -18,7 +18,7 @@ MYSQL = False
 MYSQL_USER = "kodi"
 MYSQL_PASS = "kodi"
 MYSQL_SERVER = "localhost"
-MYSQL_DATABASE  = "MyVideos90"
+MYSQL_DATABASE  = "MyVideos93"
 
 # Set this to True to get more verbose messages
 VERBOSE = False
@@ -119,10 +119,18 @@ def process_row(conn, row):
 # ---------------------------------------------------
 
 conn = open_database()
-cursor = conn.cursor()
+
+viewname_movieview = "movieview"
+with closing(conn.cursor()) as cursor:
+    cursor.execute('SELECT idVersion FROM version')
+    row = cursor.fetchone()
+    version = row['idVersion']
+    if version > 90:
+        # view name changed after version db 90
+        viewname_movieview = "movie_view"
 
 with closing(conn.cursor()) as cursor:
-    cursor.execute('SELECT idMovie, idFile, strFileName, strPath, dateAdded FROM movieview ORDER BY idFile')
+    cursor.execute('SELECT idMovie, idFile, strFileName, strPath, dateAdded FROM {0} ORDER BY idFile'.format(viewname_movieview))
     columns = map(lambda x: x[0], cursor.description)
     rows = cursor.fetchall()
 
