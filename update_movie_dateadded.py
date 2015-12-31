@@ -88,6 +88,11 @@ def process_row(conn, row):
     else:
         fullpath = os.path.join(path, filename)
 
+    # potential samba fix (not tested)
+    if fullpath.startswith('smb:'):
+        fullpath = fullpath[4:]
+    fullpath = os.path.abspath(fullpath)
+
     if not os.path.isfile(fullpath):
         print('File {0} does not exist!'.format(fullpath))
         return
