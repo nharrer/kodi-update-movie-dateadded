@@ -11,7 +11,7 @@ from contextlib import closing
 
 # IMPORTANT: In the standard case (sqlite3) just point this to your own MyVideos database.
 # Uncomment only one of the following setting
-# Fow Windows
+# For Windows
 # DATABASE_PATH = os.path.join(r"C:\Users\<Your User>\AppData\Roaming\Kodi\userdata\Database", 'MyVideos121.db')
 # For Linux
 DATABASE_PATH = os.path.join(r"/home/<Your User>", 'MyVideos121.db')
