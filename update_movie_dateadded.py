@@ -44,7 +44,7 @@ col_dateadded = 'dateAdded'
 # first element is the configured samba share
 # second element is the physical storage location
 smb_paths = [
-    ['smb://1.1.1.1/<Share_Name>/', '/<Path>/<Folder>/']
+    ['smb://1.1.1.1/<Share_Name>/', '/<Path>/<Folder>/'],
     # ['smb://1.1.1.1/<Share_Name2>/', '/<Path>/<Folder2>/']
     # etc
 ]
@@ -117,7 +117,7 @@ def process_row(conn, row):
             if fullpath.startswith(path[0]):
                 fullpath = fullpath.replace(path[0], path[1])
 
-    #fullpath = os.path.abspath(fullpath)
+    fullpath = os.path.abspath(fullpath)
 
     if DEBUG:
         print ("fullpath after replace is {0}".format(fullpath))
@@ -144,13 +144,13 @@ def process_row(conn, row):
     dateadded = str(row[col_dateadded])
 
     if dateadded != dateadded_new:
-        print(('idFile {0}: {1} -> {2} ({3})'.format(id, dateadded, dateadded_new, fullpath)))
+        print('idFile {0}: {1} -> {2} ({3})'.format(id, dateadded, dateadded_new, fullpath))
         with closing(conn.cursor()) as cursor:
             cursor.execute("UPDATE files SET dateAdded = '{0}' WHERE idFile = {1}".format(dateadded_new, id))
             conn.commit()
     else:
         if VERBOSE:            
-            print(('idFile {0}: Date OK. DB date {1} matches file date {2} ({3})'.format(id, dateadded, dateadded_new, fullpath)))
+            print('idFile {0}: Date OK. DB date {1} matches file date {2} ({3})'.format(id, dateadded, dateadded_new, fullpath))
         
 # ---------------------------------------------------
 # Main
@@ -159,17 +159,17 @@ def process_row(conn, row):
 conn = open_database()
 
 viewname_movieview = "movieview"
-with closing(conn.cursor()) as cursor:
-    
-    # keeping the following code
-    # need to check if still require since we use different table
-    #cursor.execute('SELECT idVersion FROM version')
-    #row = cursor.fetchone()
-    #version = row['idVersion']
-    #if version > 90:
-    #    # view name changed after version db 90
-    #    viewname_movieview = "movie_view"
-    # --END keeping
+
+# keeping the following code
+# need to check if still require since we use different table
+# with closing(conn.cursor()) as cursor:
+#    cursor.execute('SELECT idVersion FROM version')
+#    row = cursor.fetchone()
+#    version = row['idVersion']
+#    if version > 90:
+#        # view name changed after version db 90
+#        viewname_movieview = "movie_view"
+# --END keeping
     
 with closing(conn.cursor()) as cursor:
     cursor.execute('SELECT files.idFile, files.strFileName, path.strPath, files.dateAdded FROM files, path where files.idPath=path.idPath ORDER BY files.idFile;')
@@ -186,4 +186,3 @@ for row in rows:
     process_row(conn, row)
 
 print(("Processed {0} Rows.".format(len(rows))))
-
